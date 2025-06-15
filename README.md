@@ -9,7 +9,7 @@ This project demonstrates how to deploy a frontend application (built with a fra
 
 ## 📸 Screenshot of the Deployed Page
 
-![Screenshot](agroexpress.png)
+![Screenshot](public/agroexpress.png)
 
 ---
 
