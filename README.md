@@ -1,89 +1,63 @@
 
-# Frontend Deployment with Nginx on AWS EC2 (Ubuntu)
+# Frontend Deployment on AWS EC2 with Nginx
 
-This guide details the steps taken to deploy a frontend application (React/Vue/Angular) on an **AWS EC2 Ubuntu instance** using **Nginx** as the web server.
+This project demonstrates how to deploy a frontend application (built with a framework like React, Vue, or Angular) to an AWS EC2 Ubuntu server using Nginx.
+
+## 🌐 Public URL
+
+[http://13.48.147.215/](http://13.48.147.215/)
+
+## 📸 Screenshot of the Deployed Page
+
+![Screenshot](agroexpress.png)
 
 ---
 
-## 🖥️ 1. Launch and Set Up AWS EC2 (Ubuntu)
+## 🛠️ Project Setup and Deployment Steps
 
-1. Go to [AWS EC2 Console](https://console.aws.amazon.com/ec2/)
-2. Launch an EC2 instance with:
-   - **AMI**: Ubuntu Server (20.04 or later)
-   - **Instance Type**: t2.micro (free tier eligible)
-   - **Key Pair**: Create/download a `.pem` key
-   - **Security Group**:
-     - Allow SSH (port 22)
-     - Allow HTTP (port 80)
-     - (Optional) Allow HTTPS (port 443)
+### 1. 🚀 Launch EC2 Instance
+- Log in to [AWS Console](https://aws.amazon.com/).
+- Launch a new EC2 instance using Ubuntu 20.04 LTS.
+- Select a security group that allows **SSH (port 22)**, **HTTP (port 80)**, and optionally **HTTPS (port 443)**.
 
-3. Connect to your instance:
+### 2. 🔑 Connect to the EC2 Instance
 ```bash
-ssh -i your-key.pem ubuntu@your-ec2-public-ip
+ssh -i /path/to/your-key.pem ubuntu@13.48.147.215
 ```
 
----
-
-## ⚙️ 2. Update Server Packages
-
+### 3. 🧰 Update and Install Dependencies
 ```bash
 sudo apt update && sudo apt upgrade -y
+sudo apt install nginx curl -y
 ```
 
----
-
-## 🌐 3. Install and Configure Nginx
-
-```bash
-sudo apt install nginx -y
-sudo systemctl start nginx
-sudo systemctl enable nginx
-```
-
-Allow Nginx through UFW:
-```bash
-sudo ufw allow 'Nginx Full'
-sudo ufw enable
-```
-
-Test by visiting: `http://your-ec2-public-ip`
-
----
-
-## 🧰 4. Install Node.js and Build Frontend
-
-Install Node.js (via NodeSource):
+### 4. 📦 Install Node.js (if needed for building frontend)
 ```bash
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt install -y nodejs
+sudo apt install nodejs -y
+node -v
+npm -v
 ```
 
-Build your frontend project:
+### 5. 🏗️ Build Your Frontend Locally
+From your project directory:
 ```bash
 npm install
-npm run build  # outputs a /dist or /build folder
+npm run build
 ```
+This generates a `dist/` or `build/` folder.
 
----
-
-## 📂 5. Upload Frontend Files to Server
-
-From your local machine:
+### 6. 📤 Transfer Frontend Files to EC2
 ```bash
-scp -i your-key.pem -r dist/ ubuntu@your-ec2-public-ip:/var/www/your-app
+scp -i /path/to/your-key.pem -r dist/ ubuntu@13.48.147.215:/var/www/your-app
 ```
 
----
-
-## 📝 6. Configure Nginx to Serve Frontend
-
-Create a config file:
+### 7. ⚙️ Configure Nginx
+Create a new Nginx config:
 ```bash
 sudo nano /etc/nginx/sites-available/your-app
 ```
-
-Paste the following:
-
+Paste:
 ```nginx
 server {
     listen 80;
@@ -97,37 +71,33 @@ server {
     }
 }
 ```
-
-Enable the site:
+Enable site and restart Nginx:
 ```bash
 sudo ln -s /etc/nginx/sites-available/your-app /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-Visit: `http://your-ec2-public-ip`
+### 8. ✅ Done!
+Visit: [http://13.48.147.215/](http://13.48.147.215/)
 
 ---
 
-## 🔒 7. (Optional) SSL Setup
-
-### Option A: Self-Signed Certificate
+## ✅ Optional: Enable UFW and Allow Nginx
 ```bash
-sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
- -keyout /etc/ssl/private/nginx-selfsigned.key \
- -out /etc/ssl/certs/nginx-selfsigned.crt
+sudo ufw allow 'Nginx Full'
+sudo ufw enable
 ```
 
-Update Nginx config to listen on 443 and include SSL paths.
+## 🔒 No Domain? Skip SSL or Use Self-Signed Certificates
 
-### Option B: Use Free Domain + Let's Encrypt (if you have a domain)
-```bash
-sudo apt install certbot python3-certbot-nginx -y
-sudo certbot --nginx
-```
+If you don’t have a domain, SSL via Certbot won’t work. You can either:
+- Use HTTP only (default setup above)
+- Use a free domain (e.g. from Freenom)
+- Use a self-signed cert (not recommended for production)
 
 ---
 
-## ✅ Deployment Complete
-
-My Landing Page is now live and served through Nginx on my AWS EC2 instance.
+## 💡 Tips
+- Use `systemctl status nginx` to check service status.
+- Upload new builds by replacing the contents in `/var/www/your-app`.
