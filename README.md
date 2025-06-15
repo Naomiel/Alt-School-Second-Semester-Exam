@@ -5,7 +5,7 @@ This project demonstrates how to deploy a frontend application (built with a fra
 
 ## 🌐 Public URL
 
-[http://13.48.147.215/](http://13.48.147.215/)
+[http://13.48.147.215/](http://agroexpress.duckdns.org)
 
 ## 📸 Screenshot of the Deployed Page
 
